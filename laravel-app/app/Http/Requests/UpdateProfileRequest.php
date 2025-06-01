@@ -3,10 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
-use App\Enums\ProfileStatus;
 
-class StoreProfileRequest extends FormRequest
+class UpdateProfileRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,10 +23,8 @@ class StoreProfileRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'last_name' => 'required|string|max:50',
-            'first_name'=> 'required|string|max:50',
-            'image'     => 'sometimes|required|image',
-            'status'    => [Rule::enum(ProfileStatus::class)],
+            'last_name' => 'string|max:50',
+            'first_name'=> 'string|max:50',
         ];
     }
 }

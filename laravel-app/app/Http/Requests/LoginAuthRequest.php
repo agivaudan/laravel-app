@@ -3,18 +3,16 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
-use App\Enums\ProfileStatus;
 
-class StoreProfileRequest extends FormRequest
+class LoginAuthRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        // Authorize only if authenticated user is admin
-        return \Auth::user()->type === "ADMIN";
+        // Authorize all
+        return true;
     }
 
     /**
@@ -25,10 +23,8 @@ class StoreProfileRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'last_name' => 'required|string|max:50',
-            'first_name'=> 'required|string|max:50',
-            'image'     => 'sometimes|required|image',
-            'status'    => [Rule::enum(ProfileStatus::class)],
+            'email'     => 'required|email',
+            'password'  => 'required|min:6',
         ];
     }
 }

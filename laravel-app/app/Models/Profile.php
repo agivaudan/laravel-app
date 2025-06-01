@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 use App\Enums\ProfileStatus;
+use App\Models\User;
 
 class Profile extends Model
 {
@@ -24,10 +25,11 @@ class Profile extends Model
         'status'
     ];
 
-    // protected function casts(): array
-    // {
-    //     return [
-    //         'status' => 'string',
-    //     ];
-    // }
+    /**
+     * 
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    } 
 }

@@ -14,9 +14,8 @@ class CommentController extends Controller
      */
     public function index(Profile $profile)
     {
-        // Get all comments
+        // Get all comments for the specified profile
         return response()->json(['result' => Comment::where('profile_id', '=', $profile->id)->get()], 200);
-    
     }
 
     /**
@@ -26,10 +25,22 @@ class CommentController extends Controller
     {
         // Validate the request
         $validated = $request->validated();
-
         $validated['profile_id'] = $profile->id;
-        $validated['user_id'] = 2; // TODO get currently connected auth
+        $validated['user_id'] = \Auth::user()->id;
+
+        // If the user is an admin, check if they have already posted a comment for this profile
+        if (\Auth::user()->type === "ADMIN") {
+            $comment = Comment::where('profile_id', '=', $validated['profile_id'])
+                ->where('user_id', '=', $validated['user_id'])
+                ->first();
+
+            if (!empty($comment)) {
+               return response()->json(['result' => 'You already posted a comment for this profile'], 403);
+            }
+        }
+
         $comment = Comment::create($validated);
+
         return response()->json(['result' => $comment], 201);
     }
 
@@ -45,13 +56,13 @@ class CommentController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Comment $comment)
+    public function update(StoreCommentRequest $request, Comment $comment)
     {
         // Validate the request
-        $validated = $request->validate([
-            'content' => 'string|max:100',
-        ]);
+        // Same FormRequest as the store method because only 1 field is checked
+        $validated = $request->validated();
         $comment->update($validated);
+
         return response()->json(['result' => Comment::find($comment->id)], 200);
     
     }
@@ -62,6 +73,7 @@ class CommentController extends Controller
     public function destroy(Comment $comment)
     {
         $deleted = $comment->delete();
+
         return response()->json(['result' => $comment ? 'Comment has been deleted' : 'Comment has not been deleted'], 200);
     
     }

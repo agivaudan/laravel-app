@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Profile;
-use App\Http\Requests\StoreProfileRequest;
 use App\Enums\ProfileStatus;
+use App\Http\Requests\StoreProfileRequest;
+use App\Http\Requests\UpdateProfileRequest;
+use App\Http\Resources\ProfileResource;
+use App\Models\Profile;
+use App\Models\User;
 
 use Illuminate\Http\Request;
 
@@ -16,8 +19,8 @@ class ProfileController extends Controller
     public function index()
     {
         // Get only ACTIVE profiles
-        // return response()->json(['result' => Profile::all()], 200);
-        return response()->json(['result' => Profile::where('status', '=', ProfileStatus::ACTIVE->value)->get()], 200);
+        $profiles = ProfileResource::collection(Profile::with('user')->where('status', '=', ProfileStatus::ACTIVE->value)->get());
+        return response()->json(['result' => $profiles], 200);
     }
 
     /**
@@ -27,9 +30,17 @@ class ProfileController extends Controller
     {
         // Validate the request
         $validated = $request->validated();
-        $validated['user_id'] = 2; // TODO get currently connected auth
+        $validated['user_id'] = \Auth::user()->id;
+
+        // If the profile has a picture, save its path
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $path = $image->store('images/profiles', 'local');
+            $validated['image'] = $path;
+        }
+
         $profile = Profile::create($validated);
-        return response()->json(['result' => $profile], 201);
+        return response()->json(['result' => Profile::find($profile->id)], 201);
     }
 
     /**
@@ -44,13 +55,10 @@ class ProfileController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Profile $profile)
+    public function update(UpdateProfileRequest $request, Profile $profile)
     {
         // Validate the request
-        $validated = $request->validate([
-            'last_name' => 'string|max:50',
-            'first_name'=> 'string|max:50',
-        ]);
+        $validated = $request->validated();
         $profile->update($validated);
         return response()->json(['result' => Profile::find($profile->id)], 200);
     }
