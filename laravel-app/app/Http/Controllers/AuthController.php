@@ -18,7 +18,7 @@ class AuthController extends Controller
     {
         $credentials = $request->validated();
 
-        if (Auth::attempt($credentials)) {
+        if (Auth::guard('web')->attempt($credentials)) {
             $user = User::where('email', $request->email)->first();
             $token = $user->createToken($user->email.'-AuthToken');
             

@@ -18,12 +18,19 @@ class ProfileResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $isAdmin = false;
+        
+        if(\Auth::check()) {
+            $user = \Auth::user();
+            $isAdmin = $user->type === 'ADMIN';
+        }
+
         return [
             'id'            => $this->resource->id,
             'first_name'    => $this->resource->first_name,
             'last_name'     => $this->resource->last_name,
             'image'         => $this->resource->image,
-            'status'        => $this->when(false, $this->resource->status), // TODO put true if user is admin
+            'status'        => $this->when($isAdmin, $this->resource->status),
             'user'          => $this->resource->user,
         ];
     }
