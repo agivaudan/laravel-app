@@ -30,7 +30,7 @@ class ProfileResource extends JsonResource
             'first_name'    => $this->resource->first_name,
             'last_name'     => $this->resource->last_name,
             'image'         => $this->resource->image,
-            'status'        => $this->when($isAdmin, $this->resource->status),
+            'status'        => $this->when($isAdmin, $this->resource->status), /* field only if the user is admin */ 
             'user'          => $this->resource->user,
         ];
     }

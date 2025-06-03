@@ -22,11 +22,11 @@ class Profile extends Model
         'first_name',
         'user_id',
         'image',
-        'status'
+        'status',
     ];
 
     /**
-     * 
+     * Relationship to User::class
      */
     public function user()
     {

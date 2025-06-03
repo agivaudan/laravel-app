@@ -7,19 +7,31 @@ use App\Models\Profile;
 use App\Http\Requests\StoreCommentRequest;
 use Illuminate\Http\Request;
 
+use Symfony\Component\HttpFoundation\Response;
+
 class CommentController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the comments for a profile
+     * 
+     * @param Profile $profile
      */
     public function index(Profile $profile)
     {
         // Get all comments for the specified profile
-        return response()->json(['result' => Comment::where('profile_id', '=', $profile->id)->get()], 200);
+        return response()->json(
+            [
+                'result' => Comment::where('profile_id', '=', $profile->id)->get()
+            ],
+            Response::HTTP_OK
+        );
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created comment for a profile in DB
+     * 
+     * @param StoreCommentRequest $request quick validator of the format of the request
+     * @param Profile $profile
      */
     public function store(StoreCommentRequest $request, Profile $profile)
     {
@@ -34,27 +46,33 @@ class CommentController extends Controller
                 ->where('user_id', '=', $validated['user_id'])
                 ->first();
 
+            // Since user already posted a comment for this profile, he cannot do it again
             if (!empty($comment)) {
-               return response()->json(['result' => 'You already posted a comment for this profile'], 403);
+               return response()->json(['result' => 'You already posted a comment for this profile'], Response::HTTP_FORBIDDEN);
             }
         }
 
         $comment = Comment::create($validated);
 
-        return response()->json(['result' => $comment], 201);
+        return response()->json(['result' => $comment], Response::HTTP_CREATED);
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified comment
+     * 
+     * @param Comment $comment
      */
     public function show(Comment $comment)
     {
         // Get the specified comment
-        return response()->json(['result' => $comment], 200);
+        return response()->json(['result' => $comment], Response::HTTP_OK);
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified comment for a profile in DB
+     * 
+     * @param StoreCommentRequest $request quick validator of the format of the request
+     * @param Comment $comment
      */
     public function update(StoreCommentRequest $request, Comment $comment)
     {
@@ -63,18 +81,23 @@ class CommentController extends Controller
         $validated = $request->validated();
         $comment->update($validated);
 
-        return response()->json(['result' => Comment::find($comment->id)], 200);
-    
+        return response()->json(['result' => Comment::find($comment->id)], Response::HTTP_OK);    
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Delete the specified comment from DB
+     * 
+     * @param Comment $comment
      */
     public function destroy(Comment $comment)
     {
         $deleted = $comment->delete();
 
-        return response()->json(['result' => $comment ? 'Comment has been deleted' : 'Comment has not been deleted'], 200);
-    
+        return response()->json(
+            [
+                'result' => $comment ? 'Comment has been deleted' : 'Comment has not been deleted'
+            ],
+            Response::HTTP_OK
+        );    
     }
 }

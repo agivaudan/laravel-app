@@ -8,9 +8,12 @@ class StoreCommentRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
+     * 
+     * @return bool
      */
     public function authorize(): bool
     {
+        // All users allowed to post a comment
         return true;
     }
 

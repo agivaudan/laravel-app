@@ -17,11 +17,11 @@ class Comment extends Model
     protected $fillable = [
         'content',
         'user_id',
-        'profile_id'
+        'profile_id',
     ];
 
     /**
-     * 
+     * Relationship to User::class
      */
     public function user()
     {
@@ -29,7 +29,7 @@ class Comment extends Model
     }
 
     /**
-     * 
+     * Relationship to Profile::class
      */
     public function profile()
     {

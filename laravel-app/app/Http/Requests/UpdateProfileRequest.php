@@ -8,6 +8,8 @@ class UpdateProfileRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
+     * 
+     * @return bool
      */
     public function authorize(): bool
     {
@@ -23,8 +25,8 @@ class UpdateProfileRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'last_name' => 'string|max:50',
-            'first_name'=> 'string|max:50',
+            'last_name'     => 'string|max:50',
+            'first_name'    => 'string|max:50',
         ];
     }
 }
